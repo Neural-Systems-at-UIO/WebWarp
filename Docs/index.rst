@@ -1,4 +1,4 @@
-WebAlign: Web application for 2D image registration to 3D atlas
+WebWarp: Web application for nonlinear refinement of image registration after WebAlign
 ============================================================
 
 .. toctree::
