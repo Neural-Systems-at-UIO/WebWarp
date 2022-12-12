@@ -28,10 +28,10 @@ In this ReadtheDocs, go to the next page for illustrated alignment instructions.
 
 6. Press Delete or Backspace to remove a marker under the mouse cursor.
 
-:note::
+.. note::
  A good strategy is to place markers around the contour of the section first, and then proceed with refining the inner parts.
  
-:note::
+.. note::
  Try to keep the number of markers to a minimum. Save your markers is allowing you to go back to previous section images.
  
 7. Save your results pression the "save" button. "Save as" will allow you to save the adjustments as a new file with a different name.
