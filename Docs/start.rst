@@ -30,9 +30,9 @@ In this ReadtheDocs, go to the next page for illustrated alignment instructions.
 :note::
  Try to keep the number of markers to a minimum. Save your markers is allowing you to go back to previous section images.
  
- 7. Save your results pression the "save" button. "Save as" will allow you to save the adjustments as a new file with a different name.
+7. Save your results pression the "save" button. "Save as" will allow you to save the adjustments as a new file with a different name.
  
- 8. When the registration is finished, you can export your descriptor files ( .seg files used for analysis in the QUINT workflow) by pressing "export       overlays". All results are zipped and stored in the bucket. The result file name will be the same as the one chosen to create the registration, e.g. "my-registration.zip".
+8. When the registration is finished, you can export your descriptor files ( .seg files used for analysis in the QUINT workflow) by pressing "export       overlays". All results are zipped and stored in the bucket. The result file name will be the same as the one chosen to create the registration, e.g. "my-registration.zip".
  
  
  
