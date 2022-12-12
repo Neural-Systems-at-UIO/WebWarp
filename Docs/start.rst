@@ -16,7 +16,7 @@ In this ReadtheDocs, go to the next page for illustrated alignment instructions.
 3. Wait for the images to load: this may take some time.
 
 .. image:: images/image1.png
-   :width: 6.3in
+   :width: 7.3in
    :height: 4.04916in 
 
 4. Your registered images are visible in the main window.  The atlas regions with transparency sliders can be toggled using the "Atlas opacity" button.
