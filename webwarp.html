@@ -5,12 +5,12 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script>
-            let state = {app: "localizoom"};
+            let state = {app: "webwarp"};
             for (let setting of location.search.substring(1).split("&")) {
                 let [key, value] = setting.split("=");
                 state[key] = value;
             }
-            let client_id = "localizoom";
+            let client_id = "webwarp";
             let redirect_uri = "https://lz-nl.apps.hbp.eu/callback.php";
             location.href = `https://iam.ebrains.eu/auth/realms/hbp/protocol/openid-connect/auth?response_type=code&login=true&client_id=${client_id}&redirect_uri=${redirect_uri}&scope=profile+email+team+roles&state=${encodeURIComponent(JSON.stringify(state))}`;
         </script>
