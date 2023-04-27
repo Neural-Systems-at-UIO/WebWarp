@@ -1,5 +1,4 @@
 # WebWarp
-https://webwarp.readthedocs.io
 
 WebWarp is one of several tools developed by the Nesys laboratory, University of Oslo and participating to the Human Brain Project (HBP) with the aim of facilitating brain atlas based analysis and integration of experimental data and knowledge about the human and rodent brain.
 WebAlign is a online tool for user guided affine spatial registration (anchoring) of sectional image data, typically high resolution histological images, to a 3D reference atlas space.
