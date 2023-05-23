@@ -92,9 +92,11 @@ async function startup() {
         switch(app) {
             case app_ww:
             document.getElementById("toggleNL").style.display = "inline";
+            document.getElementById("btn_exprt").hidden=false;
                 break;
             case app_lz:
-            document.getElementById("btn_exprt").style.display="none";
+//            document.getElementById("btn_exprt").style.display="none";
+            document.getElementById("btn_excel").hidden=false;
             document.getElementById("toggleAN").style.display = "inline";
                 break;
             default:
@@ -567,73 +569,71 @@ function drawImage() {
 }
 function excel() {
     // todo: nonlin/canonicalize
-    var wnd = window.open("about:blank", "Excel export #" + Date.now());
-    var d = wnd.document;
-    d.write("<html><head><title>Excel export</title><style>textarea{width:100%;height:80%}</style><script>");
-    d.write("function swapdots(){var e=document.getElementById('ta');e.innerHTML=e.innerHTML.replace(/\\./g,',');}");
-    d.write("function swapcommas(){var e=document.getElementById('ta');e.innerHTML=e.innerHTML.replace(/,/g,'.');}");
-    d.write("<\/script></head><body><textarea id='ta'>");
-    var fn = current_section.filename;
-    var s = "ID\t" + fn.substring(0, fn.lastIndexOf(".")) + "\t\t\tHIDE\tHIDE\n";
-    s += "Resolution\t" + cfg.Width + "\t" + cfg.Height + "\n";
-    s += "\n";
-    s += "Anchor\tx\ty\tz\n";
-    s += "o\t" + ouv[0] + "\t" + ouv[1] + "\t" + ouv[2] + "\n";
-    s += "u\t" + ouv[3] + "\t" + ouv[4] + "\t" + ouv[5] + "\n";
-    s += "v\t" + ouv[6] + "\t" + ouv[7] + "\t" + ouv[8] + "\n";
-    s += "\n";
-    if (atlas.transformations.length === 1) {
-        s += "Marker#\tx\ty\t\tnx\tny\tfx\tfy\tfz\n";
-        for (var i = 0; i < poi.length; i++) {
-            var line = i + 10;
-            s += (i + 1) + "\t" + poi[i].x + "\t" + poi[i].y + "\t\t"
-                    + "=B" + line + "/$B$2\t=C" + line + "/$C$2\t"
-                    + "=B$5+B$6*$E" + line + "+B$7*$F" + line + "\t=C$5+C$6*$E" + line + "+C$7*$F" + line + "\t=D$5+D$6*$E" + line + "+D$7*$F" + line + "\n";
+    const sheets = [];
+    for (const section of sections)
+        if (section.poi.length) {
+            const rows = [];
+            const ouv = section.ouv;
+            rows.push(["ID", section.filename, , , "HIDE", "HIDE"]);
+            rows.push(["Resolution", section.width, section.height]);
+            rows.push([]);
+            rows.push(["Anchor", "x", "y", "z"]);
+            rows.push(["o", ouv[0], ouv[1], ouv[2]]);
+            rows.push(["u", ouv[3], ouv[4], ouv[5]]);
+            rows.push(["v", ouv[6], ouv[7], ouv[8]]);
+            rows.push([]);
+            if (atlas.transformations.length === 1) {
+                rows.push(["Marker#", "x", "y", , "nx", "ny", "fx", "fy", "fz"]);
+                for (const poi of section.poi) {
+                    const line = rows.length + 1;
+                    rows.push([
+                        rows.length - 8, poi.x, poi.y, , `=B${line}/B2`, `=C${line}/C2`,
+                        `=B5+B6*E${line}+B7*F${line}`,
+                        `=C5+C6*E${line}+C7*F${line}`,
+                        `=D5+D6*E${line}+D7*F${line}`
+                    ]);
+                }
+            } else {
+                for (let i = 0; i < 4; i++) {
+                    const row = ["HIDE", , , , , , , , , ];
+                    for (const trf of atlas.transformations.slice(1))
+                        row.push(trf.matrix[i][0], trf.matrix[i][1], trf.matrix[i][2]);
+                    rows.push(row);
+                }
+                const namerow = [, , , , , , ];
+                const hdrrow = ["Marker#", "x", "y", , "nx", "ny", "fx", "fy", "fz"];
+                for (const trf of atlas.transformations.slice(1)) {
+                    namerow.push(undefined, undefined, undefined, trf.name);
+                    hdrrow.push("tx", "ty", "tz");
+                }
+                rows.push(namerow, hdrrow);
+                for (const poi of section.poi) {
+                    const line = rows.length + 1;
+                    const row = [rows.length - 13, poi.x, poi.y, , `=B${line}/B2`, `=C${line}/C2`,
+                        `=B5+B6*E${line}+B7*F${line}`,
+                        `=C5+C6*E${line}+C7*F${line}`,
+                        `=D5+D6*E${line}+D7*F${line}`];
+                    for (let trf = 1; trf < atlas.transformations.length; trf++) {
+                        for (let i = 0; i < 3; i++) {
+                            const col = row.length;
+                            const c = col >= 26 ?
+                                    String.fromCharCode(64 + Math.floor(col / 26)) + String.fromCharCode(65 + col % 26)
+                                    : String.fromCharCode(65 + col);
+                            row.push(`=G${line}*${c}9+H${line}*${c}10+I${line}*${c}11+${c}12`);
+                        }
+                    }
+                    rows.push(row);
+                }
+            }
+            sheets.push([section.filename, ...rows]);
         }
-    } else {
-        var bak = atlas.transformations.shift();
-
-        for (var i = 0; i < 4; i++) {
-            s += "HIDE\t\t\t\t\t\t\t\t";
-            for (var t of atlas.transformations)
-                s += "\t" + t.matrix[i][0] + "\t" + t.matrix[i][1] + "\t" + t.matrix[i][2];
-            s += "\n";
-        }
-
-        s += "\t\t\t\t\t\t";
-        for (var t of atlas.transformations)
-            s += "\t\t\t" + t.name;
-        s += "\n";
-
-        s += "Marker#\tx\ty\t\tnx\tny\tfx\tfy\tfz";
-        for (var t of atlas.transformations)
-            s += "\tx\ty\tz";
-        s += "\n";
-
-        atlas.transformations.unshift(bak);
-
-        function idxr(i) {
-            var h = Math.floor(i / 26);
-            var l = i - h * 26;
-            var A = "A".charCodeAt();
-            if (h === 0)
-                return String.fromCharCode(A + l);
-            return String.fromCharCode(A + h - 1) + String.fromCharCode(A + l);
-        }
-
-        for (var i = 0; i < poi.length; i++) {
-            var line = i + 15;
-            s += (i + 1) + "\t" + poi[i].x + "\t" + poi[i].y + "\t\t"
-                    + "=B" + line + "/$B$2\t=C" + line + "/$C$2\t"
-                    + "=B$5+B$6*$E" + line + "+B$7*$F" + line + "\t=C$5+C$6*$E" + line + "+C$7*$F" + line + "\t=D$5+D$6*$E" + line + "+D$7*$F" + line;
-            for (var t = 1; t < atlas.transformations.length; t++)
-                s += "\t=$G" + line + "*" + idxr(6 + t * 3) + "$9+$H" + line + "*" + idxr(6 + t * 3) + "$10+$I" + line + "*" + idxr(6 + t * 3) + "$11+" + idxr(6 + t * 3) + "$12\t=$G" + line + "*" + idxr(6 + t * 3 + 1) + "$9+$H" + line + "*" + idxr(6 + t * 3 + 1) + "$10+$I" + line + "*" + idxr(6 + t * 3 + 1) + "$11+" + idxr(6 + t * 3 + 1) + "$12\t=$G" + line + "*" + idxr(6 + t * 3 + 2) + "$9+$H" + line + "*" + idxr(6 + t * 3 + 2) + "$10+$I" + line + "*" + idxr(6 + t * 3 + 2) + "$11+" + idxr(6 + t * 3 + 2) + "$12";
-            s += "\n";
-        }
-    }
-    d.write(s);
-    d.write("</textarea>Code above can be copied into an Excel sheet<br>Swap decimal dots to commas: <button onclick='swapdots()'>. -> ,</button> and revert: <button onclick='swapcommas()'>, -> .</button></body></html>");
-    d.close();
+    const xl = packxlsx(sheets);
+    const url = URL.createObjectURL(xl);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename.substring(0, filename.lastIndexOf(".")) + ".xlsx";
+    a.click();
+    URL.revokeObjectURL(url);
 }
 function meshview() {
     allpoi[section_id] = poi;

@@ -67,6 +67,7 @@
         <script src="dppick.js"></script>
         <script src="segrle.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/Tevemadar/ZipStore.js/zipstore.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/Tevemadar/PackXLSX.js/xlsxwriter.min.js"></script>
     </head>
     <body onload="startup()">
         <div id="status">
@@ -83,13 +84,14 @@
         <div id="tools">
             <!--<button id="toggleAN" onclick="toggleAN()">Annotation tools</button>-->
             <button onclick="save()" id="btn_save">Save</button><button onclick="saveas()" id="btn_saveas">Save As...</button>
-            <button id="btn_exprt" onclick="exprt()">Export overlays</button>
+            <button id="btn_exprt" onclick="exprt()" hidden>Export overlays</button>
+            <button id="btn_excel" onclick="excel()" hidden>XLSX export</button>
             <button id="toggleNL" onclick="toggleNL()">Settings</button>
             <button id="toggleAN" onclick="toggleAN()">Settings</button>
             <div id="antools">
                 Marker color: <input type="color" id="ancolor" value="#000000" oninput="drawImage()" style="height: 18px">
                 <!--<button onclick="load()">Load</button><button onclick="save()" id="btn_save">Save</button>-->
-                Export to <button onclick="excel()">Excel</button> (current section only)<!-- or <button onclick="meshview()">MeshView</button> (all slices).-->
+                <!--Export to <button onclick="excel()">Excel</button> (current section only)<!-- or <button onclick="meshview()">MeshView</button> (all slices).-->
             </div>
             <div id="nltools">
                 Marker color: <input type="color" id="nlcolor" value="#000000" oninput="drawImage()" style="height: 18px">
