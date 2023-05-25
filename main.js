@@ -32,6 +32,34 @@ async function getDescriptor() {
 }
 
 async function getTile(section, level, x, y) {
+    if(section.dzip) {
+        const dzip=section.dzip;
+        if(dzip === "loading"){
+            const callback=section.callback;
+            await new Promise(resolve=>{
+                section.callback=resolve;
+            });
+            if(callback)
+                callback();
+        }
+        if(typeof section.dzip === "string"){
+            section.dzip="loading";
+            section.dzip=await netunzip(()=>dpurlget(dzip).then(json=>json.url));
+            if(section.callback)
+                section.callback();
+            delete section.callback;
+        }
+        const buffer=await section.dzip.get(section.dzip.entries.get(`${section.base}${level}/${x}_${y}.${section.format}`));
+        const url=URL.createObjectURL(new Blob([buffer], {type: "image/"+section.format}));
+        const tile = document.createElement("img");
+        return new Promise(resolve=>{
+            tile.onload = () => {
+                URL.revokeObjectURL(url);
+                resolve(tile);
+            };
+            tile.src = url;
+        });
+    }
     const download = await dpurlget(`${sries.bucket}/${section.base}${level}/${x}_${y}.${section.format}`);
     return new Promise(resolve => {
         const tile = document.createElement("img");
@@ -57,8 +85,15 @@ async function startup() {
 
     sections = JSON.parse(JSON.stringify(sries.sections));
     for (let section of sections) {
-        let filename = section.filename;
-        section.name = filename.substring(0, filename.lastIndexOf("."));
+        const filename = section.filename;
+        if(!filename.endsWith(".dzip")){
+            section.name = filename.substring(0, filename.lastIndexOf("."));
+            section.base = `${filename}/${section.name}_files/`;
+        }else{
+            section.dzip=`${sries.bucket}/.nesysWorkflowFiles/zippedPyramids/${filename}`;
+            section.name=filename.slice(filename.lastIndexOf("/")+1,-".dzip".length);
+            section.base=section.name+"_files/";
+        }
         section.snr = parseInt(filename.match(/(?<=_s)\d+/));
         section.anchored = section.hasOwnProperty("ouv");
         let w = section.width, h = section.height, maxlevel = 0;
@@ -68,7 +103,6 @@ async function startup() {
             maxlevel++;
         }
         section.maxlevel = maxlevel;
-        section.base = `${filename}/${section.name}_files/`;
         if (!section.hasOwnProperty("markers"))
             section.markers = [];
         if (!section.hasOwnProperty("poi"))
