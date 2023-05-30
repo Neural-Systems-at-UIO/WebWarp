@@ -234,7 +234,7 @@ function dispatchSection(section) {
     triangulate();
 
     var meta = document.getElementById("metadata");
-    meta.innerHTML = /*ouv.name*/section.filename + "<br>" + cfg.Width.toString() + " x " + cfg.Height.toString() + "<br>"
+    meta.innerHTML = /*ouv.name*/section.name + "<br>" + cfg.Width.toString() + " x " + cfg.Height.toString() + "<br>"
             + atlas.name;
 //            + (args.prev ? "" : ("<br><a href='http://cmbn-navigator.uio.no/navigator/feeder/original/?id=" + section_id + "' target='_blank'>Download image</a>"));
 //    meta.style.left = window.innerWidth - meta.scrollWidth - 5 + "px";
@@ -608,7 +608,7 @@ function excel() {
         if (section.poi.length) {
             const rows = [];
             const ouv = section.ouv;
-            rows.push(["ID", section.filename, , , "HIDE", "HIDE"]);
+            rows.push(["ID", section.name, , , "HIDE", "HIDE"]);
             rows.push(["Resolution", section.width, section.height]);
             rows.push([]);
             rows.push(["Anchor", "x", "y", "z"]);
@@ -659,7 +659,7 @@ function excel() {
                     rows.push(row);
                 }
             }
-            sheets.push([section.filename, ...rows]);
+            sheets.push([section.name, ...rows]);
         }
     const xl = packxlsx(sheets);
     const url = URL.createObjectURL(xl);
