@@ -60,11 +60,18 @@ async function getTile(section, level, x, y) {
             tile.src = url;
         });
     }
-    const download = await dpurlget(`${sries.bucket}/${section.base}${level}/${x}_${y}.${section.format}`);
+    if(sries.hasOwnProperty("bucket")){
+        const download = await dpurlget(`${sries.bucket}/${section.base}${level}/${x}_${y}.${section.format}`);
+        return new Promise(resolve => {
+            const tile = document.createElement("img");
+            tile.onload = () => resolve(tile);
+            tile.src = download.url;
+        });
+    }
     return new Promise(resolve => {
         const tile = document.createElement("img");
         tile.onload = () => resolve(tile);
-        tile.src = download.url;
+        tile.src = `https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/${sries.oldisv}/${section.base}${level}/${x}_${y}.${section.format}`;
     });
 }
 
