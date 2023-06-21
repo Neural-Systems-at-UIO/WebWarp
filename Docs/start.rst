@@ -1,6 +1,6 @@
 **Opening a sample dataset**
 -------------------------------
-A Demo dataset is present in the QUINT-Demo collab: https://wiki.ebrains.eu/bin/view/Collabs/image-registration-and-analysis-demo
+A Demo dataset is present in a Demo collab: https://wiki.ebrains.eu/bin/view/Collabs/image-registration-and-analysis-demo
 
 Load the file containing linear WebAlign registration by clicking on the file: "demo_mouse_data.waln"
 
