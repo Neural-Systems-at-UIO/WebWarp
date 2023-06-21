@@ -1,8 +1,8 @@
 **Opening a sample dataset**
 -------------------------------
-A Demo dataset is present in the QUINT-Demo collab: https://wiki.ebrains.eu/bin/view/Collabs/quint-demo/
+A Demo dataset is present in the QUINT-Demo collab: https://wiki.ebrains.eu/bin/view/Collabs/image-registration-and-analysis-demo
 
-Load the file by clicking on the file: "demo_mouse_data.waln"
+Load the file containing linear WebAlign registration by clicking on the file: "demo_mouse_data.waln"
 
 Instructions about the operations are found both under "Documentation" on the upper right and inside the application by pressing the question mark.
 In this ReadtheDocs, go to the next page for illustrated alignment instructions.
@@ -38,6 +38,8 @@ In this ReadtheDocs, go to the next page for illustrated alignment instructions.
  
 8. When the registration is finished, you can export your descriptor files ( .seg files used for analysis in the QUINT workflow) by pressing "export       overlays". All results are zipped and stored in the bucket. The result file name will be the same as the one chosen to create the registration, e.g. "my-registration.zip".
  
- 
- 
+**Work with EBRAINS dataset images**
+---------------------------------------------------- 
+If you would like to work with an EBRAINS dataset, open the LocaliZoom link from the KG dataset card ( https://search.kg.ebrains.eu) and paste it in the "Import LocaliZoom link" tab in WebAlign.
+Save this series as a .waln file you then can open in WebWarp.
  
