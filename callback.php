@@ -45,6 +45,10 @@ $json["token"] = $token;
         <script>
             let state=<?php echo json_encode($json);?>;
             async function startup(){
+                if(state.hasOwnProperty("filename")){
+                    location.href="filmstripzoom.html?"+encodeURIComponent(JSON.stringify(state));
+                    return;
+                }
                 const choice=await dppick({
                     bucket:state["clb-collab-id"],
                     token:state.token,

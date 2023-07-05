@@ -10,9 +10,7 @@
                 let [key, value] = setting.split("=");
                 state[key] = value;
             }
-            let client_id = "webwarp";
-            let redirect_uri = "https://lz-nl.apps.hbp.eu/callback.php";
-            location.href = `https://iam.ebrains.eu/auth/realms/hbp/protocol/openid-connect/auth?response_type=code&login=true&client_id=${client_id}&redirect_uri=${redirect_uri}&scope=profile+email+team+roles&state=${encodeURIComponent(JSON.stringify(state))}`;
+            location.href="<?php echo getenv("ebrains_auth");?>?response_type=code&login=true&client_id=<?php echo getenv("ebrains_id_ww");?>&redirect_uri=<?php echo getenv("ebrains_redirect_ww");?>&scope=profile+email+team+roles&state="+encodeURIComponent(JSON.stringify(state));
         </script>
     </head>
     <body>
