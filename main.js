@@ -28,7 +28,7 @@ let atlas;
 
 async function getDescriptor() {
     const download = await dpurlget(bucket+"/"+filename);
-    return fetch(download.url + "?" + Date.now()).then(response => response.json());
+    return fetch(download.url.includes("?") ? download.url : download.url + "?" + Date.now()).then(response => response.json());
 }
 
 async function getTile(section, level, x, y) {
