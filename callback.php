@@ -46,6 +46,7 @@ $json["token"] = $token;
             let state=<?php echo json_encode($json);?>;
             async function startup(){
                 if(state.hasOwnProperty("filename")){
+                    state.embedded=true;
                     location.href="filmstripzoom.html?"+encodeURIComponent(JSON.stringify(state));
                     return;
                 }

@@ -76,6 +76,8 @@ async function getTile(section, level, x, y) {
 }
 
 async function startup() {
+    if(args.embedded)
+        document.getElementById("btn_saveas").style.display="none";
     window.addEventListener("resize", fullscreen);
     fullscreen();
 
@@ -112,6 +114,9 @@ async function startup() {
         section.maxlevel = maxlevel;
         if (!section.hasOwnProperty("markers"))
             section.markers = [];
+        else
+            section.markers = section.markers.map(m =>
+                Array.isArray(m) ? {x: m[0], y: m[1], nx: m[2], ny: m[3]} : m);
         if (!section.hasOwnProperty("poi"))
             section.poi = [];
     }
@@ -188,7 +193,7 @@ function fullscreen() {
     fs_setheight(sc.height = 128 + 20);
     zc.height = canvasheight = window.innerHeight - zc.offsetTop - 128 - 20;
     if (zoomer)
-        zoomer.fullcanvas();
+        zoomer.home();
 }
 
 var overlay = document.createElement("canvas");
@@ -257,14 +262,15 @@ function dispatchSection(section) {
 //    cfg.Key = function (level, x, y) {
 //        return locators.TileLocator(section_id, this.MaxLevel - level, x, y, cfg.Format);
 //    };
-    cfg.Load = async function (key, section, level, x, y, next) {
-        let tile = await getTile(section, level, x, y);
+    cfg.Load = async function (/*key, section, */level, x, y/*, next*/) {
+        let tile = await getTile(section, section.maxlevel-level, x, y);
 //        var img = document.createElement("img");
         var canvas = document.createElement("canvas");
         canvas.width = cfg.TileSize;
         canvas.height = cfg.TileSize;
         canvas.getContext("2d").drawImage(tile, x === 0 ? 0 : -cfg.Overlap, y === 0 ? 0 : -cfg.Overlap);
-        next(canvas);
+        return canvas;
+//        next(canvas);
 //        img.onload = function () {
 //            canvas.getContext("2d").drawImage(img, x === 0 ? 0 : -cfg.Overlap, y === 0 ? 0 : -cfg.Overlap);
 //            next(canvas);
@@ -600,9 +606,9 @@ function dispatchSection(section) {
             }
     };
     if (zoomer)
-        zoomer.detach();
+        zoomer.destroy();
     zoomer = new Zoomer(document.getElementById("zoomcanvas"), cfg);
-    zoomer.fullcanvas();
+    zoomer.home();
 }
 function drawImage() {
     if (zoomer)
@@ -865,7 +871,7 @@ function load() {
 //            delete sries.sections[i].markers;
 //}
 async function save(){
-    if(filename.endsWith(appext))
+    if(args.embedded || filename.endsWith(appext))
         dosave();
     else
         saveas();
@@ -891,7 +897,8 @@ async function dosave(){
         case app_ww:
             for (let i = 0; i < sries.sections.length; i++)
                 if (sections[i].markers.length)
-                    sries.sections[i].markers = sections[i].markers;
+                    // sries.sections[i].markers = sections[i].markers;
+                    sries.sections[i].markers = sections[i].markers.map(m => [m.x, m.y, m.nx, m.ny]);
                 else
                     delete sries.sections[i].markers;
                 break;
