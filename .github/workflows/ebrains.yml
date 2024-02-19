@@ -13,5 +13,5 @@ jobs:
         with:
           source_repo: "Neural-Systems-at-UIO/WebWarp"
           source_branch: "master"
-          destination_repo: "https://ghpusher:${{ secrets.EBRAINS_GITLAB_ACCESS_TOKEN }}@gitlab.ebrains.eu/csucs/webwarp.git"
+          destination_repo: "https://ghpusher:${{ secrets.EBRAINS_GITLAB_ACCESS_TOKEN }}@gitlab.ebrains.eu:ri/tech-hub/apps/nesys/webwarp.git"
           destination_branch: "master"
