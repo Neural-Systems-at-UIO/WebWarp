@@ -92,6 +92,7 @@ async function startup() {
                         popup(event.data);
                 });
 
+    const dziproot = sries.dziproot ?? ".nesysWorkflowFiles/zippedPyramids/";
     sections = JSON.parse(JSON.stringify(sries.sections));
     for (let section of sections) {
         const filename = section.filename;
@@ -99,7 +100,7 @@ async function startup() {
             section.name = filename.substring(0, filename.lastIndexOf("."));
             section.base = `${filename}/${section.name}_files/`;
         }else{
-            section.dzip=`${sries.bucket}/.nesysWorkflowFiles/zippedPyramids/${filename}`;
+            section.dzip=`${sries.bucket}/${dziproot}${filename}`;
             section.name=filename.slice(filename.lastIndexOf("/")+1,-".dzip".length);
             section.base=section.name+"_files/";
         }
