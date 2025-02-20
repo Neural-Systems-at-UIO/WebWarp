@@ -4,14 +4,14 @@ const token = args.token;
 const app = args.app;
 const app_ww = "webwarp";
 const app_lz = "localizoom";
-const appext= {[app_ww]:".wwrp",[app_lz]:".lz"}[app];
+const appext = {[app_ww]: ".wwrp", [app_lz]: ".lz"}[app];
 let filename = args.filename;
 //args.tools = args.nl = true;
 
-async function dpurlget(bucketfile){
+async function dpurlget(bucketfile) {
     return fetch(
-        `https://data-proxy.ebrains.eu/api/v1/buckets/${bucketfile}?redirect=false`,
-        {headers: {authorization: `Bearer ${token}`}}).then(response => response.json());
+            `https://data-proxy.ebrains.eu/api/v1/buckets/${bucketfile}?redirect=false`,
+            {headers: {authorization: `Bearer ${token}`}}).then(response => response.json());
 }
 
 let sries;
@@ -27,32 +27,32 @@ let atlas;
 //}
 
 async function getDescriptor() {
-    const download = await dpurlget(bucket+"/"+filename);
+    const download = await dpurlget(bucket + "/" + filename);
     return fetch(download.url.includes("?") ? download.url : download.url + "?" + Date.now()).then(response => response.json());
 }
 
 async function getTile(section, level, x, y) {
-    if(section.dzip) {
-        const dzip=section.dzip;
-        if(dzip === "loading"){
-            const callback=section.callback;
-            await new Promise(resolve=>{
-                section.callback=resolve;
+    if (section.dzip) {
+        const dzip = section.dzip;
+        if (dzip === "loading") {
+            const callback = section.callback;
+            await new Promise(resolve => {
+                section.callback = resolve;
             });
-            if(callback)
+            if (callback)
                 callback();
         }
-        if(typeof section.dzip === "string"){
-            section.dzip="loading";
-            section.dzip=await netunzip(()=>dpurlget(dzip).then(json=>json.url));
-            if(section.callback)
+        if (typeof section.dzip === "string") {
+            section.dzip = "loading";
+            section.dzip = await netunzip(() => dpurlget(dzip).then(json => json.url));
+            if (section.callback)
                 section.callback();
             delete section.callback;
         }
-        const buffer=await section.dzip.get(section.dzip.entries.get(`${section.base}${level}/${x}_${y}.${section.format}`));
-        const url=URL.createObjectURL(new Blob([buffer], {type: "image/"+section.format}));
+        const buffer = await section.dzip.get(section.dzip.entries.get(`${section.base}${level}/${x}_${y}.${section.format}`));
+        const url = URL.createObjectURL(new Blob([buffer], {type: "image/" + section.format}));
         const tile = document.createElement("img");
-        return new Promise(resolve=>{
+        return new Promise(resolve => {
             tile.onload = () => {
                 URL.revokeObjectURL(url);
                 resolve(tile);
@@ -60,7 +60,7 @@ async function getTile(section, level, x, y) {
             tile.src = url;
         });
     }
-    if(sries.hasOwnProperty("bucket")){
+    if (sries.hasOwnProperty("bucket")) {
         const download = await dpurlget(`${sries.bucket}/${section.base}${level}/${x}_${y}.${section.format}`);
         return new Promise(resolve => {
             const tile = document.createElement("img");
@@ -76,8 +76,8 @@ async function getTile(section, level, x, y) {
 }
 
 async function startup() {
-    if(args.embedded)
-        document.getElementById("btn_saveas").style.display="none";
+    if (args.embedded)
+        document.getElementById("btn_saveas").style.display = "none";
     window.addEventListener("resize", fullscreen);
     fullscreen();
 
@@ -96,13 +96,13 @@ async function startup() {
     sections = JSON.parse(JSON.stringify(sries.sections));
     for (let section of sections) {
         const filename = section.filename;
-        if(!filename.endsWith(".dzip")){
+        if (!filename.endsWith(".dzip")) {
             section.name = filename.substring(0, filename.lastIndexOf("."));
             section.base = `${filename}/${section.name}_files/`;
-        }else{
-            section.dzip=`${sries.bucket}/${dziproot}${filename}`;
-            section.name=filename.slice(filename.lastIndexOf("/")+1,-".dzip".length);
-            section.base=section.name+"_files/";
+        } else {
+            section.dzip = `${sries.bucket}/${dziproot}${filename}`;
+            section.name = filename.slice(filename.lastIndexOf("/") + 1, -".dzip".length);
+            section.base = section.name + "_files/";
         }
         section.snr = parseInt(filename.match(/(?<=_s)\d+/));
         section.anchored = section.hasOwnProperty("ouv");
@@ -135,20 +135,20 @@ async function startup() {
 //    if (args.view) {
 //        document.getElementById("tools").style.display = "none";
 //    } else {
-        document.getElementById("tools").style.top = document.getElementById("status").offsetHeight + "px";
-        switch(app) {
-            case app_ww:
+//??    document.getElementById("tools").style.top = document.getElementById("status").offsetHeight + "px";
+    switch (app) {
+        case app_ww:
             document.getElementById("toggleNL").style.display = "inline";
-            document.getElementById("btn_exprt").hidden=false;
-                break;
-            case app_lz:
+            document.getElementById("btn_exprt").hidden = false;
+            break;
+        case app_lz:
 //            document.getElementById("btn_exprt").style.display="none";
-            document.getElementById("btn_excel").hidden=false;
+            document.getElementById("btn_excel").hidden = false;
             document.getElementById("toggleAN").style.display = "inline";
-                break;
-            default:
-                throw app+"?";
-        }
+            break;
+        default:
+            throw app + "?";
+    }
 //    }
 //    if (args.opacity) {
 //        document.getElementById("alpha").value = args.opacity;
@@ -183,16 +183,10 @@ async function startup() {
 
 function fullscreen() {
     var zc = document.getElementById("zoomcanvas");
-    var sc = document.getElementById("scroller");
-//    sc.addEventListener("wheel", fs_mwheel, true);
-
-    var help = document.getElementById("help");
-    document.getElementById("metadata").style.top = help.style.top = zc.offsetTop + "px";
-    help.style.left = window.innerWidth - 520 + "px";
-
-    fs_setwidth(zc.width = sc.width = canvaswidth = window.innerWidth);
-    fs_setheight(sc.height = 128 + 20);
-    zc.height = canvasheight = window.innerHeight - zc.offsetTop - 128 - 20;
+    var main = document.getElementById("main");
+    zc.width = main.offsetWidth;
+    zc.height = main.offsetHeight;
+    fs_resize();
     if (zoomer)
         zoomer.home();
 }
@@ -209,7 +203,7 @@ var zoomer;
 var cfg;
 
 let current_section;
-let markers,poi;
+let markers, poi;
 let ouv;
 function dispatchSection(section) {
     current_section = section;
@@ -264,7 +258,7 @@ function dispatchSection(section) {
 //        return locators.TileLocator(section_id, this.MaxLevel - level, x, y, cfg.Format);
 //    };
     cfg.Load = async function (/*key, section, */level, x, y/*, next*/) {
-        let tile = await getTile(section, section.maxlevel-level, x, y);
+        let tile = await getTile(section, section.maxlevel - level, x, y);
 //        var img = document.createElement("img");
         var canvas = document.createElement("canvas");
         canvas.width = cfg.TileSize;
@@ -321,28 +315,28 @@ function dispatchSection(section) {
         ctx.globalAlpha = 1;
 
         if (show_triangles.checked) {
-            for(const style of [["#000000",2.5],["#FFFFFF",0.75]]){
-            ctx.strokeStyle = style[0];// "#000000";
-            ctx.lineWidth = style[1];// 2.5;
-            ctx.beginPath();
-            triangles.forEach(function (triangle) {
-                var v = vertices[triangle[2]];
-                ctx.moveTo(
-                        Math.round((v[0] - x) * cw / w) + 0.5,
-                        Math.round((v[1] - y) * ch / h) + 0.5
-                        );
-                for (var i = 0; i < 3; i++) {
-                    var v = vertices[triangle[i]];
-                    ctx.lineTo(
+            for (const style of [["#000000", 2.5], ["#FFFFFF", 0.75]]) {
+                ctx.strokeStyle = style[0]; // "#000000";
+                ctx.lineWidth = style[1];// 2.5;
+                ctx.beginPath();
+                triangles.forEach(function (triangle) {
+                    var v = vertices[triangle[2]];
+                    ctx.moveTo(
                             Math.round((v[0] - x) * cw / w) + 0.5,
                             Math.round((v[1] - y) * ch / h) + 0.5
                             );
-                }
-            });
-            ctx.stroke();
+                    for (var i = 0; i < 3; i++) {
+                        var v = vertices[triangle[i]];
+                        ctx.lineTo(
+                                Math.round((v[0] - x) * cw / w) + 0.5,
+                                Math.round((v[1] - y) * ch / h) + 0.5
+                                );
+                    }
+                });
+                ctx.stroke();
             }
         }
-        switch(app) {
+        switch (app) {
             case app_ww:
                 ctx.strokeStyle = "#FFFF80";
                 try {
@@ -383,8 +377,8 @@ function dispatchSection(section) {
                 ctx.stroke();
                 break;
             default:
-                throw app+"?";
-            }
+                throw app + "?";
+        }
         if ((pop !== null) && (alpha !== 0)) {
             ctx.fillStyle = "rgb(" + pop.r + "," + pop.g + "," + pop.b + ")";
             if (popscape)
@@ -411,18 +405,18 @@ function dispatchSection(section) {
         var mx = cursor.imagex = Math.round(x + event.offsetX * w / cw);
         var my = cursor.imagey = Math.round(y + event.offsetY * h / ch);
         if (markerpick !== undefined) {
-            switch(app) {
+            switch (app) {
                 case app_ww:
-                markers[markerpick].nx = mx;
-                markers[markerpick].ny = my;
-                triangulate();
-                break;
-            case app_lz:
-                poi[markerpick].x = mx;
-                poi[markerpick].y = my;
-                break;
-            default:
-                throw app+"?";
+                    markers[markerpick].nx = mx;
+                    markers[markerpick].ny = my;
+                    triangulate();
+                    break;
+                case app_lz:
+                    poi[markerpick].x = mx;
+                    poi[markerpick].y = my;
+                    break;
+                default:
+                    throw app + "?";
             }
             drawImage();
             return;
@@ -462,25 +456,25 @@ function dispatchSection(section) {
 //        if (args.view)
 //            return false;
         markerpick = undefined;
-        switch(app) {
+        switch (app) {
             case app_ww:
-            for (var i = 0; i < markers.length; i++) {
-                var sx = Math.round((markers[i].nx - x) * cw / w) + 0.5;
-                var sy = Math.round((markers[i].ny - y) * ch / h) + 0.5;
-                if (event.offsetX > sx - 10 && event.offsetX < sx + 10 && event.offsetY > sy - 10 && event.offsetY < sy + 10)
-                    markerpick = i;
-            }
-            break;
-        case app_lz:
-            for (var i = 0; i < poi.length; i++) {
-                var sx = Math.round((poi[i].x - x) * cw / w) + 0.5;
-                var sy = Math.round((poi[i].y - y) * ch / h) + 0.5;
-                if (event.offsetX > sx - 10 && event.offsetX < sx + 10 && event.offsetY > sy - 10 && event.offsetY < sy + 10)
-                    markerpick = i;
-            }
+                for (var i = 0; i < markers.length; i++) {
+                    var sx = Math.round((markers[i].nx - x) * cw / w) + 0.5;
+                    var sy = Math.round((markers[i].ny - y) * ch / h) + 0.5;
+                    if (event.offsetX > sx - 10 && event.offsetX < sx + 10 && event.offsetY > sy - 10 && event.offsetY < sy + 10)
+                        markerpick = i;
+                }
+                break;
+            case app_lz:
+                for (var i = 0; i < poi.length; i++) {
+                    var sx = Math.round((poi[i].x - x) * cw / w) + 0.5;
+                    var sy = Math.round((poi[i].y - y) * ch / h) + 0.5;
+                    if (event.offsetX > sx - 10 && event.offsetX < sx + 10 && event.offsetY > sy - 10 && event.offsetY < sy + 10)
+                        markerpick = i;
+                }
                 break;
             default:
-                throw app+"?";
+                throw app + "?";
         }
         return markerpick !== undefined;
     };
@@ -511,100 +505,102 @@ function dispatchSection(section) {
                 break;
             case "Delete":
 //                if (!args.view) {
-                    switch(app) {
-                        case app_ww:
-                    {
-                        var idx = undefined;
-                        for (var i = 0; i < markers.length; i++) {
-                            var sx = Math.round((markers[i].x - x) * cw / w) + 0.5;
-                            var sy = Math.round((markers[i].y - y) * ch / h) + 0.5;
-                            if (cursor.screenx > sx - 8 && cursor.screenx < sx + 8 && cursor.screeny > sy - 8 && cursor.screeny < sy + 8)
-                                idx = i;
-                            var sx = Math.round((markers[i].nx - x) * cw / w) + 0.5;
-                            var sy = Math.round((markers[i].ny - y) * ch / h) + 0.5;
-                            if (cursor.screenx > sx - 8 && cursor.screenx < sx + 8 && cursor.screeny > sy - 8 && cursor.screeny < sy + 8)
-                                idx = i;
+                switch (app) {
+                    case app_ww:
+                        {
+                            var idx = undefined;
+                            for (var i = 0; i < markers.length; i++) {
+                                var sx = Math.round((markers[i].x - x) * cw / w) + 0.5;
+                                var sy = Math.round((markers[i].y - y) * ch / h) + 0.5;
+                                if (cursor.screenx > sx - 8 && cursor.screenx < sx + 8 && cursor.screeny > sy - 8 && cursor.screeny < sy + 8)
+                                    idx = i;
+                                var sx = Math.round((markers[i].nx - x) * cw / w) + 0.5;
+                                var sy = Math.round((markers[i].ny - y) * ch / h) + 0.5;
+                                if (cursor.screenx > sx - 8 && cursor.screenx < sx + 8 && cursor.screeny > sy - 8 && cursor.screeny < sy + 8)
+                                    idx = i;
+                            }
+                            if (idx !== undefined) {
+                                markers.splice(idx, 1);
+                                triangulate();
+                                drawImage();
+                            }
                         }
-                        if (idx !== undefined) {
-                            markers.splice(idx, 1);
-                            triangulate();
-                            drawImage();
+                        break;
+                    case app_lz:
+                        {
+                            var idx = undefined;
+                            for (var i = 0; i < poi.length; i++) {
+                                var sx = Math.round((poi[i].x - x) * cw / w) + 0.5;
+                                var sy = Math.round((poi[i].y - y) * ch / h) + 0.5;
+                                if (cursor.screenx > sx - 8 && cursor.screenx < sx + 8 && cursor.screeny > sy - 8 && cursor.screeny < sy + 8)
+                                    idx = i;
+                            }
+                            if (idx !== undefined) {
+                                poi.splice(idx, 1);
+                                drawImage();
+                            }
                         }
-                    }
-                    break;
-                case app_lz:{
-                        var idx = undefined;
-                        for (var i = 0; i < poi.length; i++) {
-                            var sx = Math.round((poi[i].x - x) * cw / w) + 0.5;
-                            var sy = Math.round((poi[i].y - y) * ch / h) + 0.5;
-                            if (cursor.screenx > sx - 8 && cursor.screenx < sx + 8 && cursor.screeny > sy - 8 && cursor.screeny < sy + 8)
-                                idx = i;
-                        }
-                        if (idx !== undefined) {
-                            poi.splice(idx, 1);
-                            drawImage();
-                        }
-                    }
-                break;
-            default:
-                throw app+"?";
-                    
+                        break;
+                    default:
+                        throw app + "?";
+
                 }
                 break;
             default:
                 if (/*!args.view &&*/ cursor.imagex >= 0 && cursor.imagey >= 0 && cursor.imagex <= cfg.Width && cursor.imagey <= cfg.Height)
-                    switch(app) {
+                    switch (app) {
                         case app_ww:
-                    {
-                        var D = [cursor.imagex, cursor.imagey];
-                        for (var triangle of triangles) {
-                            var ai = triangle[0];
-                            var bi = triangle[1];
-                            var ci = triangle[2];
-                            var A = vertices[ai];
-                            var B = vertices[bi];
-                            var C = vertices[ci];
-                            var uv1 = intri(A, B, C, D);
-                            if (uv1) {
-                                //                                        console.log(uv1);
-                                if (ai >= 4)
-                                    A = markers[ai - 4];
-                                else
-                                    A = {x: vertices[ai][0], y: vertices[ai][1]};
-                                if (bi >= 4)
-                                    B = markers[bi - 4];
-                                else
-                                    B = {x: vertices[bi][0], y: vertices[bi][1]};
-                                if (ci >= 4)
-                                    C = markers[triangle[2] - 4];
-                                else
-                                    C = {x: vertices[ci][0], y: vertices[ci][1]};
-                                markers.push({
-                                    x: A.x + (B.x - A.x) * uv1[0] + (C.x - A.x) * uv1[1],
-                                    y: A.y + (B.y - A.y) * uv1[0] + (C.y - A.y) * uv1[1],
-                                    nx: cursor.imagex,
-                                    ny: cursor.imagey
-                                });
-                                //                                        console.log(markers[markers.length-1]);
-                                D = false;
-                                break;
+                            {
+                                var D = [cursor.imagex, cursor.imagey];
+                                for (var triangle of triangles) {
+                                    var ai = triangle[0];
+                                    var bi = triangle[1];
+                                    var ci = triangle[2];
+                                    var A = vertices[ai];
+                                    var B = vertices[bi];
+                                    var C = vertices[ci];
+                                    var uv1 = intri(A, B, C, D);
+                                    if (uv1) {
+                                        //                                        console.log(uv1);
+                                        if (ai >= 4)
+                                            A = markers[ai - 4];
+                                        else
+                                            A = {x: vertices[ai][0], y: vertices[ai][1]};
+                                        if (bi >= 4)
+                                            B = markers[bi - 4];
+                                        else
+                                            B = {x: vertices[bi][0], y: vertices[bi][1]};
+                                        if (ci >= 4)
+                                            C = markers[triangle[2] - 4];
+                                        else
+                                            C = {x: vertices[ci][0], y: vertices[ci][1]};
+                                        markers.push({
+                                            x: A.x + (B.x - A.x) * uv1[0] + (C.x - A.x) * uv1[1],
+                                            y: A.y + (B.y - A.y) * uv1[0] + (C.y - A.y) * uv1[1],
+                                            nx: cursor.imagex,
+                                            ny: cursor.imagey
+                                        });
+                                        //                                        console.log(markers[markers.length-1]);
+                                        D = false;
+                                        break;
+                                    }
+                                }
+                                if (D) {
+                                    //                                    console.log("!");
+                                    markers.push({x: cursor.imagex, y: cursor.imagey, nx: cursor.imagex, ny: cursor.imagey});
+                                }
+                                triangulate();
+                                drawImage();
                             }
-                        }
-                        if (D) {
-                            //                                    console.log("!");
-                            markers.push({x: cursor.imagex, y: cursor.imagey, nx: cursor.imagex, ny: cursor.imagey});
-                        }
-                        triangulate();
-                        drawImage();
-                    } break;
-                case app_lz:
-                        poi.push({x: cursor.imagex, y: cursor.imagey});
-                        drawImage();
-                break;
-            default:
-                throw app+"?";
-                }
-            }
+                            break;
+                        case app_lz:
+                            poi.push({x: cursor.imagex, y: cursor.imagey});
+                            drawImage();
+                            break;
+                        default:
+                            throw app + "?";
+                    }
+        }
     };
     if (zoomer)
         zoomer.destroy();
@@ -871,30 +867,30 @@ function load() {
 //        else
 //            delete sries.sections[i].markers;
 //}
-async function save(){
-    if(args.embedded || filename.endsWith(appext))
+async function save() {
+    if (args.embedded || filename.endsWith(appext))
         dosave();
     else
         saveas();
 }
-async function saveas(){
-    const choice=await dppick({
+async function saveas() {
+    const choice = await dppick({
         bucket,
         token,
-        title:"Save as...",
-        path:filename.substring(0,filename.lastIndexOf("/")+1),
-        extensions:[appext],
-        create:appext,
-        createdefault:filename.slice(filename.lastIndexOf("/")+1,filename.lastIndexOf("."))+appext,
-        createbutton:"Save"
+        title: "Save as...",
+        path: filename.substring(0, filename.lastIndexOf("/") + 1),
+        extensions: [appext],
+        create: appext,
+        createdefault: filename.slice(filename.lastIndexOf("/") + 1, filename.lastIndexOf(".")) + appext,
+        createbutton: "Save"
     });
-    if(choice.cancel)
+    if (choice.cancel)
         return;
-    filename=choice.create || choice.pick;
+    filename = choice.create || choice.pick;
     dosave();
 }
-async function dosave(){
-    switch(app) {
+async function dosave() {
+    switch (app) {
         case app_ww:
             for (let i = 0; i < sries.sections.length; i++)
                 if (sections[i].markers.length)
@@ -902,14 +898,14 @@ async function dosave(){
                     sries.sections[i].markers = sections[i].markers.map(m => [m.x, m.y, m.nx, m.ny]);
                 else
                     delete sries.sections[i].markers;
-                break;
-            case app_lz:
+            break;
+        case app_lz:
             for (let i = 0; i < sries.sections.length; i++)
                 if (sections[i].poi.length)
                     sries.sections[i].poi = sections[i].poi;
                 else
                     delete sries.sections[i].poi;
-                break;
+            break;
     }
 
     const upload = await fetch(

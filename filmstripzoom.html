@@ -5,28 +5,123 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width">
         <style>
-            body{margin: 0;padding: 0; overflow:hidden;}
-            canvas{display: block;cursor: crosshair;outline: none;}
-            canvas#scroller{cursor: pointer;}
-            div{display: inline-block;}
-            #traf{width: 130px;}
-            #status{padding: 5px;background: #F0F0F0;width: 900px;/*height: 20px;*/}
-            #coords{float: right;padding-right: 5px;}
-            #outline{float:right;height: 18px;}
-            #outlinedesc{float:right;padding-right: 5px;}
-            #alpha{float:right;height: 15px;width: 100px;}
-            #alphadesc{float:right;padding-right: 5px;}
-/*            #bright{float:right;height: 15px;width: 100px;}
-            #brightdesc{float:right;padding-right: 5px;}*/
-            #tools{background: #F0F0F0;height: 20px;padding: 5px;position: absolute;left:0;}
-            /*#toolsinner{display: none;}*/
+            html{
+                height: 100%;
+                overflow: hidden;
+            }
+            body{
+                margin: auto;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+            canvas{
+                display: block;
+                cursor: crosshair;
+                outline: none;
+            }
+            #traf{
+                width: 130px;
+            }
+            #status{
+                padding: 5px;
+                background: #F0F0F0;
+                flex: none;
+            }
+            #coords{
+                display: inline-block;
+                width: 500px;
+            }
+            #outline{
+                height: 18px;
+            }
+            #alpha{
+                height: 15px;
+                width: 100px;
+            }
+            #container{
+                position: relative;
+                flex: auto;
+                display:flex;
+                overflow: hidden;
+            }
+            #scrollsep{
+                background-color: gray;
+                width: 0.5em;
+            }
+            #main{
+                position: relative;
+                flex: 1 1 auto;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            #filmstrip{
+                display: flex;
+                flex-direction: column;
+            }
+            #striphead{
+                flex: none;
+            }
+            #stripscroller{
+                overflow-y: scroll;
+                flex: auto;
+                display: flex;
+                flex-direction: column;
+            }
+            .icon{
+                position: relative;
+                border-top: 5px solid transparent;
+                border-bottom: 5px solid transparent;
+            }
+            .icon.active{
+                border-top: 5px solid orange;
+                border-bottom: 5px solid orange;
+            }
+            .icnv{
+                position: absolute;
+                top: 0;
+                left: 0;
+                cursor: pointer;
+            }
+            #controls{
+                position: absolute;
+                top: 0;
+                padding: 0.5em;
+            }
+            #tools{
+                background: #F0F0F0;
+                height: 20px;
+                padding: 5px;
+                position: absolute;
+                left:0;
+            }
             #toggleAN,#toggleNL,
             #antools,
-            #nltools{display: none;}
-            #helpbutton{float: right;padding: 5px;}
-            #help{display: none;width: 500px;background: #F0F0F0;position: absolute;padding: 10px;}
-            #metadata{display: block;position: absolute;text-align: center; right:0;}
-            
+            #nltools{
+                display: none;
+            }
+            #helpbutton{
+                float: right;
+            }
+            #help{
+                display: none;
+                width: 500px;
+                background: #F0F0F0;
+                position: absolute;
+                top: 0;
+                right: 0;
+                padding: 10px;
+            }
+            #metadata{
+                color: black;
+                background: lightgray;
+                position: absolute;
+                top: 0;
+                right: 0;
+                text-align: center;
+                padding: 0.5em;
+            }
             #cover{
                 background: darkgray;
                 opacity: 0.5;
@@ -55,7 +150,6 @@
             }
         </style>
         <script src="cache.js"></script>
-        <!--<script src="inflater.js"></script>-->
         <script src="derle.js"></script>
         <script src="slicer.js"></script>
         <script src="filmstrip.js"></script>
@@ -74,59 +168,55 @@
     <body onload="startup()">
         <div id="status">
             <select id="traf"></select>
-<!--            <input type="range" id="bright" min="1" max="20" step="0.2" value="1" onchange="drawImage()">
-            <div id="brightdesc">Brighten image:</div>-->
-            <input type="color" value="#0000FF" id="outline" oninput="handleOvly(event)">
-            <div id="outlinedesc">Outline:</div>
-            <input type="range" id="alpha" min="0" max="100" step="10" value="100" oninput="handleOvly(event)">
-            <div id="alphadesc">Atlas opacity:</div>
-            <div id="coords"></div>
+            <span id="coords"></span>
+            Atlas opacity:
+            <input type="range" id="alpha" min="0" max="100" step="10" value="100" onchange="handleOvly(event)">
+            Outline:
+            <input type="color" value="#0000FF" id="outline" onchange="handleOvly(event)">
+            <span id="helpbutton"><button onclick="toggleHelp()">?</button></span>
         </div>
-        <div id="helpbutton"><button onclick="toggleHelp()">?</button></div>
-        <div id="tools">
-            <!--<button id="toggleAN" onclick="toggleAN()">Annotation tools</button>-->
-            <button onclick="save()" id="btn_save">Save</button><button onclick="saveas()" id="btn_saveas">Save As...</button>
-            <button id="btn_exprt" onclick="exprt()" hidden>Export overlays</button>
-            <button id="btn_excel" onclick="excel()" hidden>XLSX export</button>
-            <button id="toggleNL" onclick="toggleNL()">Settings</button>
-            <button id="toggleAN" onclick="toggleAN()">Settings</button>
-            <div id="antools">
-                Marker color: <input type="color" id="ancolor" value="#000000" oninput="drawImage()" style="height: 18px">
-                <!--<button onclick="load()">Load</button><button onclick="save()" id="btn_save">Save</button>-->
-                <!--Export to <button onclick="excel()">Excel</button> (current section only)<!-- or <button onclick="meshview()">MeshView</button> (all slices).-->
+        <div id="container">
+            <div id="main">
+                <div id="tools">
+                    <button onclick="save()" id="btn_save">Save</button><button onclick="saveas()" id="btn_saveas">Save As...</button>
+                    <button id="btn_exprt" onclick="exprt()" hidden>Export overlays</button>
+                    <button id="btn_excel" onclick="excel()" hidden>XLSX export</button>
+                    <button id="toggleNL" onclick="toggleNL()">Settings</button>
+                    <button id="toggleAN" onclick="toggleAN()">Settings</button>
+                    <div id="antools">
+                        Marker color: <input type="color" id="ancolor" value="#000000" oninput="drawImage()" style="height: 18px">
+                    </div>
+                    <div id="nltools">
+                        Marker color: <input type="color" id="nlcolor" value="#000000" oninput="drawImage()" style="height: 18px">
+                        <input type="checkbox" id="show_triangles" onchange="drawImage()">Show triangles
+                    </div>
+                </div>
+                <canvas id="zoomcanvas" tabindex="1" onmouseover="event.target.focus()"></canvas>
+                <div id="metadata"></div>
             </div>
-            <div id="nltools">
-                Marker color: <input type="color" id="nlcolor" value="#000000" oninput="drawImage()" style="height: 18px">
-                <!--<button onclick="load()" disabled>Load</button>-->
-                <input type="checkbox" id="show_triangles" onchange="drawImage()">Show triangles
+            <div id="scrollsep"></div>
+            <div id="filmstrip">
+                <div id="striphead"><input type="range" id="fs_alpha" min="0" max="100" step="10" value="30" oninput="fs_ovly(event)"></div>
+                <div id="stripscroller"></div>
             </div>
-<!--            <div id="toolsinner">
-                Marker color: <input type="color" id="crosscolor" value="#000000" onchange="drawImage()" style="height: 18px">
-                <button onclick="load()">Load</button><button onclick="save()" id="btn_save">Save</button>
-                Export to <button onclick="excel()">Excel</button> (this slice) or <button onclick="meshview()">MeshView</button> (all slices).
-                <input type="checkbox" id="show_triangles" onchange="drawImage()">Show triangles
-            </div>-->
+            <div id="help">
+                Controls:<br>
+                <ul>
+                    <li>Pan and zoom with mouse drag and mouse scroll wheel</li>
+                    <li>Step backwards and forwards in series with left and right arrow keys<sup><sub>*</sub></sup></li>
+                    <li>Quick set segmentation transparency to minimum and back using down and up arrow keys<sup><sub>*</sub></sup></li>
+                    <!--                <li>Press Space<sup><sub>*</sub></sup> to annotate points of interest. Atlas coordinates for points of interest can be exported to Excel or MeshView atlas viewer (requires Adobe Flash)</li>
+                                    <li>Press Delete<sup><sub>*</sub></sup> to remove an annotation marker under the mouse cursor</li>
+                                    <li>Drag an annotation marker to refine its position</li>-->
+                </ul>
+                <a href="https://localizoom.readthedocs.io/" target="_blank">Documentation</a><br>
+                <br>
+                *: Click on main view to activate keyboard controls.
+            </div>
         </div>
-        <canvas id="zoomcanvas" tabindex="1" onmouseover="event.target.focus()"></canvas>
-        <canvas id="scroller" onclick="fs_mclick(event)" onwheel="fs_mwheel(event)"></canvas>
         <div id="cover"></div>
         <div id="popup">
             <div id="popcont"></div>
-        </div>
-        <div id="metadata"></div>
-        <div id="help">
-            Controls:<br>
-            <ul>
-                <li>Pan and zoom with mouse drag and mouse scroll wheel</li>
-                <li>Step backwards and forwards in series with left and right arrow keys<sup><sub>*</sub></sup></li>
-                <li>Quick set segmentation transparency to minimum and back using down and up arrow keys<sup><sub>*</sub></sup></li>
-<!--                <li>Press Space<sup><sub>*</sub></sup> to annotate points of interest. Atlas coordinates for points of interest can be exported to Excel or MeshView atlas viewer (requires Adobe Flash)</li>
-                <li>Press Delete<sup><sub>*</sub></sup> to remove an annotation marker under the mouse cursor</li>
-                <li>Drag an annotation marker to refine its position</li>-->
-            </ul>
-            <a href="https://localizoom.readthedocs.io/" target="_blank">Documentation</a><br>
-            <br>
-            *: Click on main view to activate keyboard controls.
         </div>
     </body>
 </html>

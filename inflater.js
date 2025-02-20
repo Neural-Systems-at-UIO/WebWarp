@@ -1,6 +1,6 @@
-function inflate(data, config={}) {
-    let {approx,progress,notrim}=config;
-    let report=Date.now();
+function inflate(data, config = {}) {
+    let {approx, progress, notrim} = config;
+    let report = Date.now();
     if (!approx)
         approx = data.length;
     let readpos = 0;
@@ -9,9 +9,9 @@ function inflate(data, config={}) {
 
     let last;
     do {
-        if(progress && Date.now()-report>100){
-            progress(readpos,data.length*8);
-            report=Date.now();
+        if (progress && Date.now() - report > 100) {
+            progress(readpos, data.length * 8);
+            report = Date.now();
         }
         last = readbit();
         let typ = readbits(2);
@@ -29,7 +29,7 @@ function inflate(data, config={}) {
                 while (len--)
 //                                result.push(readbits(8));//!!
                     write(readbits(8));
-                    //result[writepos++] = readbits(8);//!!
+                //result[writepos++] = readbits(8);//!!
                 break;
             case 3:
                 throw "Type3?";
@@ -123,9 +123,9 @@ function inflate(data, config={}) {
     } while (!last);
     console.log(readpos, data.length * 8);
     console.log(writepos);
-    if(!notrim)
+    if (!notrim)
         resize(writepos);
-    return notrim?{result,length:writepos}:result;
+    return notrim ? {result, length: writepos} : result;
 
     function readbit() {
         return (data[readpos >> 3] >> (readpos++ & 7) & 1);
@@ -175,15 +175,15 @@ function inflate(data, config={}) {
         result[writepos++] = b;
     }
     function resize(len) {
-        if(result.length===len)
+        if (result.length === len)
             return;
-        let realloc=new Uint8Array(len);
-        if(len>result.length)
-            for(let i=0;i<result.length;i++)
-                realloc[i]=result[i];
+        let realloc = new Uint8Array(len);
+        if (len > result.length)
+            for (let i = 0; i < result.length; i++)
+                realloc[i] = result[i];
         else
-            for(let i=0;i<len;i++)
-                realloc[i]=result[i];
+            for (let i = 0; i < len; i++)
+                realloc[i] = result[i];
         result = realloc;
     }
 }
