@@ -19,7 +19,7 @@ https://webwarp.readthedocs.io/en/latest/index.html
 # Licence
 - Source code: MIT License
 
-- # Current version
+# Current version
 - v0.7
 
 - # Citation
