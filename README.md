@@ -6,9 +6,6 @@ A key feature of the tool is its ability to generate user defined cut planes thr
 Webwarp is accissible through the QUINT online service.
 ## Access: through the QUINT Online service: https://rodentworkbench.apps.ebrains.eu/
 
-# Acknowledgements
-WebWarp is developed by the Neural Systems Laboratory at the Institute of Basic Medical Sciences, University of Oslo, Norway. WebAlign  was developed with support from the EBRAINS infrastructure, and funding from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Framework Partnership Agreement No. 650003 (HBP FPA).
-
 # Documentation
 https://webwarp.readthedocs.io/en/latest/index.html
 
