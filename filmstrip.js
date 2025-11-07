@@ -7,16 +7,16 @@ const fs_data = {
 function fs_start() {
     fs_redraw();
     const idx = Math.floor(sections.length / 2);
-    fs_activate({target: sections[idx].key.firstElementChild});
+    fs_activate({target: sections[idx].key.firstElementChild}, true);
 }
 
 function fs_prev() {
     if (fs_data.active && fs_data.active.previousSibling)
-        fs_activate({target: fs_data.active.previousSibling.firstElementChild});
+        fs_activate({target: fs_data.active.previousSibling.firstElementChild}, true);
 }
 function fs_next() {
     if (fs_data.active && fs_data.active.nextSibling)
-        fs_activate({target: fs_data.active.nextSibling.firstElementChild});
+        fs_activate({target: fs_data.active.nextSibling.firstElementChild}, true);
 }
 
 function fs_redraw() {
@@ -38,6 +38,20 @@ function fs_redraw() {
         const h = icon.height = overlay.height = 128 * item.height / item.width;
         div.appendChild(icon);
         div.appendChild(overlay);
+        if(app===app_ww) {
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.className = "icbx";
+            checkbox.onclick = fs_done;
+            if(item.wwdone){
+                checkbox.checked=true;
+                div.classList.add("done");
+            }else{
+                checkbox.checked=false;
+                div.classList.add("notdone");
+            }
+            div.appendChild(checkbox);
+        }
         scroller.appendChild(div);
         const ovly = slice(item.ouv);
         for (const cnv of [icon, overlay]) {
@@ -45,10 +59,22 @@ function fs_redraw() {
             ctx.drawImage(ovly, 0, 0, w, h);
         }
     }
-
 }
 
-function fs_activate(event) {
+function fs_done(event) {
+    const target = event.target.parentElement;
+    if(event.target.checked){
+        target.classList.add("done");
+        target.classList.remove("notdone");
+        fs_data.iconmap.get(target).wwdone=true;
+    }else{
+        target.classList.add("notdone");
+        target.classList.remove("done");
+        delete fs_data.iconmap.get(target).wwdone;
+    }
+}
+
+function fs_activate(event, scroll) {
     const target = event.target.parentElement;
     if (fs_data.active === target)
         return;
@@ -56,7 +82,8 @@ function fs_activate(event) {
         fs_data.active.classList.remove("active");
     fs_data.active = target;
     fs_data.active.classList.add("active");
-    fs_data.active.scrollIntoView({block: "center"});
+    if (scroll)
+        fs_data.active.scrollIntoView({block: "center"});
     dispatchSection(fs_data.iconmap.get(target));
 }
 

@@ -155,6 +155,7 @@ class Zoomer {
         const h = this.#handlers;
         canvas.addEventListener("mousedown", h.mdown = e => this.#mdown(e), true);
         canvas.addEventListener("mouseup", h.mup = e => this.#mup(e), true);
+        canvas.addEventListener("mouseout", h.mup, true);
         canvas.addEventListener("mousemove", h.mmove = e => this.#mmove(e), true);
         canvas.addEventListener("wheel", h.mwheel = e => this.#mwheel(e), true);
         canvas.addEventListener("keydown", h.kdown = e => this.#kdown(e), true);
@@ -168,6 +169,7 @@ class Zoomer {
         const h = this.#handlers;
         c.removeEventListener("mousedown", h.mdown, true);
         c.removeEventListener("mouseup", h.mup, true);
+        c.removeEventListener("mouseout", h.mup, true);
         c.removeEventListener("mousemove", h.mmove, true);
         c.removeEventListener("wheel", h.mwheel, true);
         c.removeEventListener("keydown", h.kdown, true);

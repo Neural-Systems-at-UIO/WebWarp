@@ -76,18 +76,43 @@
             }
             .icon{
                 position: relative;
-                border-top: 5px solid transparent;
-                border-bottom: 5px solid transparent;
+                border: 5px solid transparent;
+/*                border-top: 5px solid transparent;
+                border-bottom: 5px solid transparent;*/
             }
             .icon.active{
-                border-top: 5px solid orange;
-                border-bottom: 5px solid orange;
+                border: 5px solid orange;
+/*                border-top: 5px solid orange;
+                border-bottom: 5px solid orange;*/
+            }
+            .icon.done{
+                border: 5px solid green;
+/*                border-top: 5px solid green;
+                border-bottom: 5px solid green;*/
+            }
+            .icon.notdone{
+                border: 5px solid darkred;
+/*                border-top: 5px solid red;
+                border-bottom: 5px solid purple;*/
+            }
+            .icon.active.done{
+                border: 5px dotted orange;
+                background: green;
+            }
+            .icon.active.notdone{
+                border: 5px dotted orange;
+                background: darkred;
             }
             .icnv{
                 position: absolute;
                 top: 0;
                 left: 0;
                 cursor: pointer;
+            }
+            .icbx{
+                position: absolute;
+                top: 0;
+                left: 0;
             }
             #controls{
                 position: absolute;
