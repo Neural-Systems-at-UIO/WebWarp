@@ -77,8 +77,10 @@ async function getTile(section, level, x, y) {
 }
 
 async function startup() {
-    if (args.embedded)
+    if (args.embedded) {
         document.getElementById("btn_saveas").style.display = "none";
+        document.getElementById("btn_exprt").style.display = "none";
+    }
     window.addEventListener("resize", fullscreen);
     fullscreen();
 
@@ -141,6 +143,8 @@ async function startup() {
         case app_ww:
             document.getElementById("toggleNL").style.display = "inline";
             document.getElementById("btn_exprt").hidden = false;
+            document.getElementById("btn_clear").hidden = false;
+            document.getElementById("btn_clearall").hidden = false;
             break;
         case app_lz:
 //            document.getElementById("btn_exprt").style.display="none";
@@ -1084,4 +1088,29 @@ async function exprt() {
         body: zipfile
     });
     cover();
+}
+
+function clearMarkers() {
+    markers.splice(0);
+    triangulate();
+    drawImage();
+    const active=fs_data.active;
+    active.classList.add("notdone");
+    active.classList.remove("done");
+    active.getElementsByTagName("input")[0].checked=false;
+    delete fs_data.iconmap.get(active).wwdone;
+}
+
+function clearAllMarkers() {
+    if(confirm("Remove markers from all sections in the series?")) {
+        for(let [div,section] of fs_data.iconmap) {
+            div.classList.add("notdone");
+            div.classList.remove("done");
+            div.getElementsByTagName("input")[0].checked=false;
+            section.markers.splice(0);
+            delete section.wwdone;
+        }
+        triangulate();
+        drawImage();
+    }
 }
