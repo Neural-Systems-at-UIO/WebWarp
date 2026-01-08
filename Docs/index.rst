@@ -9,6 +9,7 @@ WebWarp: Web application for nonlinear refinement of image registration after We
    installation
    Acknowledgements
    support
+   FAQ
    
   
  
@@ -23,9 +24,7 @@ WebWarp: Web application for nonlinear refinement of image registration after We
    :numbered:
    :maxdepth: 3
    
-   start
-   align
-   FAQ
+  registration
    
    
    
