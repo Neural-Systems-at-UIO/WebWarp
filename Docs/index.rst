@@ -16,7 +16,6 @@ WebWarp: Web application for nonlinear refinement of image registration after We
    
 .. toctree::
    :caption: Operations
-   :numbered:
    :maxdepth: 3
    
    registration
