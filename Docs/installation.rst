@@ -1,20 +1,12 @@
-**Setting up the work environment**
+**Installation**
 -----------------------------
--Register for an EBRAINS account, login, and set up a private collab.
 
--Initialise the Bucket by clicking on Bucket in the navigation panel -> Create Bucket.
+**System requirements**
+~~~~~~~~~~~~~~~~~~~~~~~~
+Web application for spatial registration of histological section images from rodent brains to reference 3D atlases. 
+Any web browser can be used.
 
--Give users Admin, Editor or Viewer rights by clicking Team in the navigation panel.
 
--Install Webwarp from the EBRAINS Collaboratory App Store.
-
-   1. To install Collaboratory Apps, click on the + Create button (top right corner). 
-   2. Give the page a Title (for example, WebWarp), select the Community App option, and click Create.
-   3. Select the App to install (for example, WebWarp), and click Save and View.
-   4. Repeat this for all the relevant Community Apps.
-   5. Navigate between the Apps in the navigation panel. File transfer between the Apps is through the Bucket.
-    
-    
 **Conditions of use**
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -22,36 +14,19 @@
 
 Source code: MIT License.
 
-
 **Citation of the tool:**
 
--Puchades MA, et al. Comming soon!
-   
-**Cite funding**
+-RRID on SciCrunch: (WebAlign, RRID:SCR_026758)
+
+- Puchades M, Yates SC, Csucs G, Carey H, Balkir A, Leergaard T, Bjaalie JG.
+   Software and pipelines for registration and analyses of rodent brain image data in reference atlas space. Frontiers of Neuroinformations. 2025. https://doi.org/10.3389/fninf.2025.1629388
  
-WebWarp is developed at the Neural Systems Laboratory, Institute of
-Basic Medical Sciences,University of Oslo (Norway), with funding from the European Union’s
-Horizon 2020 Framework Programme for Research and Innovation under the
-Framework Partnership Agreement No. 650003 (HBP FPA).
 
-**Citation of the atlases embedded in the tool:**
+**Access**
+~~~~~~~~~~~~
 
-WebAlign can be used with the following reference atlases:
+WebAlign can be accessed through our integrated workflows with an EBRAINs account:
 
-+--------------------------------------------------+
-|Allen Mouse Brain Atlas version 3 2017            |
-|                                                  |
-|Waxholm Space Atlas of the Sprague Dawley rat v4  |
-+--------------------------------------------------+     
-How to cite:
+1. The QUINT online workflow, accessible here: https://quint-online.apps.ebrains.eu/, more information about the QUINT online workflow can be found here: https://quint-webtools.readthedocs.io/en/latest/index.html
 
-* Allen Mouse Brain Atlas (@ 2004 Allen Institute for Brain Science. Allen Mouse Brain Atlas. Available from:  
-http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/annotation/.                     
-
-* Waxholm Space atlas of the Sprague Dawley rat brain       
-version 1.01,2,3 and 4 (RRID: SCR_017124; Papp et al.,NeuroImage 97, 374-386, 2014;
-Papp et al., NeuroImage 105, 561–562, 2015; Kjonigsen et al., NeuroImage 108, 441-449, 2015;
-Osen et al., NeuroImage 199, 38-56, 2019; Kleven et al., in preparation)                         
-
-For reuse of the Waxholm Space atlas of the Sprague Dawley rat brain,see citation policy at  
-https://www.nitrc.org/citation/?group_id=1081
+2. The LocaliView workflow: https://localiview.apps.ebrains.eu/, more information about the QUINT online workflow can be found here: https://localiview.readthedocs.io/en/latest/Introduction.html
