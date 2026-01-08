@@ -7,6 +7,7 @@ WebWarp: Web application for nonlinear refinement of image registration after We
 
    Introduction
    installation
+   Acknowledgements
    support
    
   
