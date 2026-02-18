@@ -3,7 +3,7 @@
 WebWarp is one of several tools developed by the Nesys laboratory, University of Oslo and participating to the Human Brain Project (HBP) with the aim of facilitating brain atlas based analysis and integration of experimental data and knowledge about the rodent brain.
 WebWarp is a online tool for user guided nonlinear spatial registration (anchoring) of sectional image data, typically high resolution histological images, to a 3D reference atlas space.
 A key feature of the tool is its ability to generate user defined cut planes through the atlas templates that match the orientation of the cutting plane of the 2D experimental images (atlas maps). Webwarp is compatible with registration performed with the WebAlign tool and they are used in combination.
-Webwarp is accissible through the QUINT online service.
+Webwarp is apart of the QUINT-online service.
 
 # Access
 
