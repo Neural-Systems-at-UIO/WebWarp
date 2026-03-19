@@ -1,3 +1,4 @@
+const fs_width = 160;
 const fs_data = {
     iconmap: new Map,
     observer: new IntersectionObserver(loader),
@@ -34,24 +35,23 @@ function fs_redraw() {
         overlay.onclick = fs_activate;
         overlay.style.opacity = opacity;
         overlay.className = "icnv";
-        const w = icon.width = overlay.width = 128;
-        const h = icon.height = overlay.height = 128 * item.height / item.width;
+        const w = icon.width = overlay.width = fs_width;
+        const h = icon.height = overlay.height = fs_width * item.height / item.width;
         div.appendChild(icon);
         div.appendChild(overlay);
-        if(app===app_ww) {
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.className = "icbx";
-            checkbox.onclick = fs_done;
-            if(item.wwdone){
-                checkbox.checked=true;
-                div.classList.add("done");
-            }else{
-                checkbox.checked=false;
-                div.classList.add("notdone");
-            }
-            div.appendChild(checkbox);
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.disabled = true;
+        checkbox.className = "icbx";
+        checkbox.onclick = fs_done;
+        if(item[appdone]){
+            checkbox.checked=true;
+            div.classList.add("done");
+        }else{
+            checkbox.checked=false;
+            div.classList.add("notdone");
         }
+        div.appendChild(checkbox);
         scroller.appendChild(div);
         const ovly = slice(item.ouv);
         for (const cnv of [icon, overlay]) {
@@ -61,27 +61,48 @@ function fs_redraw() {
     }
 }
 
+function fs_alter() {
+    fs_data.active.classList.remove("done");
+    fs_data.active.classList.add("notdone");
+    fs_data.active.classList.add("notsaved");
+    delete fs_data.iconmap.get(fs_data.active)[appdone];
+    fs_data.active.children[2].checked=false;
+}
+
+function fs_saved() {
+    for(let [div] of fs_data.iconmap) {
+        div.classList.remove("notsaved");
+    }
+}
+
 function fs_done(event) {
     const target = event.target.parentElement;
     if(event.target.checked){
         target.classList.add("done");
         target.classList.remove("notdone");
-        fs_data.iconmap.get(target).wwdone=true;
+        fs_data.iconmap.get(target)[appdone]=true;
     }else{
         target.classList.add("notdone");
         target.classList.remove("done");
-        delete fs_data.iconmap.get(target).wwdone;
+        delete fs_data.iconmap.get(target)[appdone];
     }
+    if(args.embedded)
+        dosave();
+    else
+        target.classList.add("notsaved");
 }
 
 function fs_activate(event, scroll) {
     const target = event.target.parentElement;
     if (fs_data.active === target)
         return;
-    if (fs_data.active)
+    if (fs_data.active) {
         fs_data.active.classList.remove("active");
+        fs_data.active.getElementsByTagName("input")[0].disabled = true;
+    }
     fs_data.active = target;
     fs_data.active.classList.add("active");
+    fs_data.active.getElementsByTagName("input")[0].disabled = false;
     if (scroll)
         fs_data.active.scrollIntoView({block: "center"});
     dispatchSection(fs_data.iconmap.get(target));
@@ -108,7 +129,7 @@ async function loader(entries) {
                 height = (height + 1) >> 1;
             }
             const icon = await getTile(image, maxlevel - level, 0, 0);
-            div.firstElementChild.getContext("2d").drawImage(icon, 0, 0, 128, height * 128 / width);
+            div.firstElementChild.getContext("2d").drawImage(icon, 0, 0, fs_width, height * fs_width / width);
         }
 }
 

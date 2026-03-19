@@ -5,6 +5,7 @@ const app = args.app;
 const app_ww = "webwarp";
 const app_lz = "localizoom";
 const appext = {[app_ww]: ".wwrp", [app_lz]: ".lz"}[app];
+const appdone = {[app_ww]: "wwdone", [app_lz]: "lzdone"}[app];
 let filename = args.filename;
 //args.tools = args.nl = true;
 
@@ -78,14 +79,39 @@ async function getTile(section, level, x, y) {
 
 async function startup() {
     if (args.embedded) {
-        document.getElementById("btn_saveas").style.display = "none";
-        document.getElementById("btn_exprt").style.display = "none";
+        document.getElementById("bucket_tools").style.display = "none";
+//        document.getElementById("btn_saveas").style.display = "none";
+//        document.getElementById("btn_exprt").style.display = "none";
     }
     window.addEventListener("resize", fullscreen);
     fullscreen();
 
     popup("Loading data");
     sries = await getDescriptor();
+    
+    if (!sries.hasOwnProperty("settings"))
+        sries.settings = {};
+    const settings = sries.settings;
+    if (settings.hasOwnProperty("overlay")) {
+        const overlay = settings.overlay;
+        const alpha = overlay.alpha;
+        document.getElementById("alpha").value = alpha;
+        const outline = document.getElementById("outline");
+        outline.value = overlay.color;
+        //outline.disabled = alpha !== 100;
+    } else
+        settings.overlay = {};
+//    if (settings.hasOwnProperty("filmstrip")) {
+//        const filmstrip = settings.filmstrip;
+//        const alpha = filmstrip.alpha;
+//        document.getElementById("fs_alpha").value = alpha;
+//        //const outline = document.getElementById("stripoutline");
+//        //outline.value = filmstrip.color;
+//        //outline.disabled = alpha !== 100;
+//    } else
+//        settings.filmstrip = {};
+    if (settings.hasOwnProperty("markercolor"))
+        document.getElementById("ancolor").value = document.getElementById("nlcolor").value = settings.markercolor;
 
     atlas = new Promise(resolve => new Worker("getlas.js?" + sries.atlas)
                 .onmessage = event => {
@@ -148,7 +174,7 @@ async function startup() {
             break;
         case app_lz:
 //            document.getElementById("btn_exprt").style.display="none";
-            document.getElementById("btn_excel").hidden = false;
+            document.getElementById("btn_excel").hidden = args.embedded;
             document.getElementById("toggleAN").style.display = "inline";
             break;
         default:
@@ -423,6 +449,7 @@ function dispatchSection(section) {
                 default:
                     throw app + "?";
             }
+            fs_alter();
             drawImage();
             return;
         }
@@ -496,12 +523,14 @@ function dispatchSection(section) {
                 fs_next();
                 break;
             case "ArrowUp":
+                event.preventDefault();
                 if (prevalpha) {
                     alpha.value = prevalpha;
                     drawImage();
                 }
                 break;
             case "ArrowDown":
+                event.preventDefault();
                 if (alpha.value !== "0") {
                     prevalpha = alpha.value;
                     alpha.value = 0;
@@ -525,6 +554,7 @@ function dispatchSection(section) {
                                     idx = i;
                             }
                             if (idx !== undefined) {
+                                fs_alter();
                                 markers.splice(idx, 1);
                                 triangulate();
                                 drawImage();
@@ -541,6 +571,7 @@ function dispatchSection(section) {
                                     idx = i;
                             }
                             if (idx !== undefined) {
+                                fs_alter();
                                 poi.splice(idx, 1);
                                 drawImage();
                             }
@@ -591,6 +622,7 @@ function dispatchSection(section) {
                                             C = markers[ci - 4];
                                         else
                                             C = {x: vertices[ci][0], y: vertices[ci][1]};
+                                        fs_alter();
                                         markers.push({
                                             x: A.x + (B.x - A.x) * uv1[0] + (C.x - A.x) * uv1[1],
                                             y: A.y + (B.y - A.y) * uv1[0] + (C.y - A.y) * uv1[1],
@@ -604,6 +636,7 @@ function dispatchSection(section) {
                                 }
                                 if (D) {
                                     //                                    console.log("!");
+                                    fs_alter();
                                     markers.push({x: cursor.imagex, y: cursor.imagey, nx: cursor.imagex, ny: cursor.imagey});
                                 }
                                 const bughunt=JSON.stringify(markers[markers.length-1]);
@@ -617,6 +650,7 @@ function dispatchSection(section) {
                             }
                             break;
                         case app_lz:
+                            fs_alter();
                             poi.push({x: cursor.imagex, y: cursor.imagey});
                             drawImage();
                             break;
@@ -913,21 +947,31 @@ async function saveas() {
     dosave();
 }
 async function dosave() {
+    const settings = sries.settings;
+    const overlay = settings.overlay;
+    overlay.color = document.getElementById("outline").value;
+    overlay.alpha = document.getElementById("alpha").valueAsNumber;
+//    const filmstrip = settings.filmstrip;
+//    filmstrip.color = document.getElementById("outline").value; //!!
+//    filmstrip.alpha = document.getElementById("fs_alpha").valueAsNumber;
+    
+    for (let i = 0; i < sries.sections.length; i++)
+        if(sections[i][appdone])
+            sries.sections[i][appdone] = true;
+        else
+            delete sries.sections[i][appdone];
     switch (app) {
         case app_ww:
-            for (let i = 0; i < sries.sections.length; i++){
+            settings.markercolor = document.getElementById("nlcolor").value;
+            for (let i = 0; i < sries.sections.length; i++)
                 if (sections[i].markers.length)
                     // sries.sections[i].markers = sections[i].markers;
                     sries.sections[i].markers = sections[i].markers.map(m => [m.x, m.y, m.nx, m.ny]);
                 else
                     delete sries.sections[i].markers;
-                if(sections[i].wwdone)
-                    sries.sections[i].wwdone = true;
-                else
-                    delete sries.sections[i].wwdone;
-            }
             break;
         case app_lz:
+            settings.markercolor = document.getElementById("ancolor").value;
             for (let i = 0; i < sries.sections.length; i++)
                 if (sections[i].poi.length)
                     sries.sections[i].poi = sections[i].poi;
@@ -955,6 +999,7 @@ async function dosave() {
         },
         body: JSON.stringify(sries)
     });
+    fs_saved();
 }
 
 
@@ -1094,11 +1139,12 @@ function clearMarkers() {
     markers.splice(0);
     triangulate();
     drawImage();
-    const active=fs_data.active;
-    active.classList.add("notdone");
-    active.classList.remove("done");
-    active.getElementsByTagName("input")[0].checked=false;
-    delete fs_data.iconmap.get(active).wwdone;
+    fs_alter();
+//    const active=fs_data.active;
+//    active.classList.add("notdone");
+//    active.classList.remove("done");
+//    active.getElementsByTagName("input")[0].checked=false;
+//    delete fs_data.iconmap.get(active).wwdone;
 }
 
 function clearAllMarkers() {
@@ -1107,7 +1153,10 @@ function clearAllMarkers() {
             div.classList.add("notdone");
             div.classList.remove("done");
             div.getElementsByTagName("input")[0].checked=false;
-            section.markers.splice(0);
+            if(section.markers.length) {
+                div.classList.add("notsaved");
+                section.markers.splice(0);
+            }
             delete section.wwdone;
         }
         triangulate();
