@@ -175,6 +175,7 @@ async function startup() {
         case app_lz:
 //            document.getElementById("btn_exprt").style.display="none";
             document.getElementById("btn_excel").hidden = args.embedded;
+            document.getElementById("btn_meshview").hidden = false;
             document.getElementById("toggleAN").style.display = "inline";
             break;
         default:
