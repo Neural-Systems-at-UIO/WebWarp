@@ -5,7 +5,8 @@ let name = location.search.substring(1);
 let message = "Loading atlas<br>" + name.replaceAll("_", " ") + "<br>";
 postMessage(message + "0%");
 let xhr = new XMLHttpRequest();
-xhr.open("GET", name + ".json", false);
+//xhr.open("GET", name + ".json", false);
+xhr.open("GET", "https://data-proxy.ebrains.eu/api/v1/buckets/quint-atlas-binaries/LZ-flatpacks/" + name + ".json", false);
 xhr.responseType = "json";
 xhr.send();
 let json = xhr.response;
@@ -19,7 +20,8 @@ for (let label of json.labels)
 console.log(Date.now() - start, "Got json");
 xhr = new XMLHttpRequest();
 //xhr.open("GET",name+".pack",false);
-xhr.open("GET", name + ".pack");
+//xhr.open("GET", name + ".pack");
+xhr.open("GET", "https://data-proxy.ebrains.eu/api/v1/buckets/quint-atlas-binaries/LZ-flatpacks/" + name + ".pack");
 xhr.responseType = "arraybuffer";
 //xhr.send();
 xhr.onprogress = event => {
