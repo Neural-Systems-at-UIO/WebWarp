@@ -104,7 +104,7 @@ function fs_activate(event, scroll) {
     fs_data.active.classList.add("active");
     fs_data.active.getElementsByTagName("input")[0].disabled = false;
     if (scroll)
-        fs_data.active.scrollIntoView({block: "center"});
+        fs_data.active.scrollIntoView({block: "center", container: "nearest"});
     dispatchSection(fs_data.iconmap.get(target));
 }
 
@@ -135,5 +135,5 @@ async function loader(entries) {
 
 function fs_resize() {
     if (fs_data.active)
-        fs_data.active.scrollIntoView({block: "center"});
+        fs_data.active.scrollIntoView({block: "center", container: "nearest"});
 }

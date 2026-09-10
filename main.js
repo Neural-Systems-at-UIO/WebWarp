@@ -16,6 +16,7 @@ async function dpurlget(bucketfile) {
 }
 
 let sries;
+let saved;
 let sections;
 let atlas;
 
@@ -88,6 +89,7 @@ async function startup() {
 
     popup("Loading data");
     sries = await getDescriptor();
+    saved = JSON.stringify(sries);
     
     if (!sries.hasOwnProperty("settings"))
         sries.settings = {};
@@ -945,6 +947,7 @@ async function saveas() {
     if (choice.cancel)
         return;
     filename = choice.create || choice.pick;
+    saved = false;
     dosave();
 }
 async function dosave() {
@@ -981,6 +984,12 @@ async function dosave() {
             break;
     }
 
+    const json = JSON.stringify(sries);
+    if (json === saved) {
+//        console.log("Nothing to save.");
+        return;
+    }
+
     const upload = await fetch(
             `https://data-proxy.ebrains.eu/api/v1/buckets/${bucket}/${filename}`, {
                 method: "PUT",
@@ -998,11 +1007,40 @@ async function dosave() {
         headers: {
             "Content-Type": "application/x." + app
         },
-        body: JSON.stringify(sries)
+        body: json
     });
+    saved = json;
+//    console.log("Saved.");    
     fs_saved();
 }
 
+if (args.embedded) {
+    let down;
+    function autosave() {
+//        if (drag || !ready)
+        if (down || !sries || !atlas)
+            return;
+        dosave();
+    }
+    let timer;
+    function startauto() {
+        timer = setInterval(autosave, 3000);
+    }
+    document.addEventListener("mousedown", () => down = true);
+    document.addEventListener("mouseup", () => down = false);
+    document.addEventListener("mouseout", () => down = false);
+    document.addEventListener("visibilitychange", ()=>{
+        if (document.hidden) {
+            dosave();
+            clearInterval(timer);
+//            console.log("Stopped.");
+        } else {
+            startauto();
+//            console.log("Resumed.");
+        }
+    });
+    startauto();
+}
 
 function toggleHelp() {
     var helpstyle = document.getElementById("help").style;
